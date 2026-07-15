@@ -71,6 +71,7 @@ interface AppContextType {
   fetchReservedTables: () => Promise<void>;
   addReservation: () => Promise<{ success: boolean; reservationId: string }>;
   updateReservationStatus: (reservationId: string, status: "승인" | "거절") => Promise<void>;
+  deleteReservation: (reservationId: string) => Promise<void>;
   refreshReservations: () => Promise<void>;
 }
 
@@ -334,6 +335,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const deleteReservation = async (reservationId: string) => {
+    try {
+      const res = await fetch(`/api/reservations/${reservationId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        await refreshReservations();
+        await fetchReservedTables(); // Free tables in SeatMap immediately
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error("Delete status client error:", err);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -362,6 +380,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetchReservedTables,
         addReservation,
         updateReservationStatus,
+        deleteReservation,
         refreshReservations
       }}
     >

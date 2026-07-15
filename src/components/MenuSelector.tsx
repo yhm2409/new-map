@@ -27,9 +27,9 @@ export const MenuSelector: React.FC<MenuSelectorProps> = ({ onCheckout }) => {
   const categories = [
     { id: "all", label: "전체" },
     { id: "appetizer", label: "에피타이저" },
-    { id: "main", label: "메인 디쉬" },
+    { id: "main", label: "메인" },
     { id: "dessert", label: "디저트" },
-    { id: "drink", label: "와인 & 음료" }
+    { id: "drink", label: "음료" }
   ];
 
   const filteredMenu = activeCategory === "all"
@@ -43,30 +43,28 @@ export const MenuSelector: React.FC<MenuSelectorProps> = ({ onCheckout }) => {
   const isReservationReady = bookingDate !== "" && bookingTime !== "" && selectedTableId !== null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="flex flex-col gap-6 text-left">
       
-      {/* Left 2 Columns: Menu List */}
-      <div className="lg:col-span-2 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <h3 className="text-xl font-bold text-[#191f28] flex items-center gap-2">
-            <MenuIcon className="h-5 w-5 text-[#3182f6]" />
+      {/* 1. UPPER SECTION: Menu Selector with Scroll */}
+      <div className="rounded-2xl bg-white p-4.5 border border-[#f2f4f6] toss-shadow space-y-4">
+        <div className="flex justify-between items-center border-b border-[#f2f4f6] pb-2.5">
+          <h3 className="text-sm font-bold text-[#191f28] flex items-center gap-1.5">
+            <MenuIcon className="h-4.5 w-4.5 text-[#3182f6]" />
             파인 다이닝 메뉴 사전 선택
           </h3>
-          <p className="text-xs text-[#8b95a1]">
-            예약 일정에 맞추어 현장에서 조리될 코스 요리를 미리 선택해 보세요.
-          </p>
+          <span className="text-[10px] text-[#8b95a1] font-semibold">위아래로 스크롤하여 선택</span>
         </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap gap-2 border-b border-[#e5e8eb] pb-4">
+        <div className="flex gap-1.5 overflow-x-auto pb-1.5 scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-4.5 py-2 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer ${
+              className={`px-3 py-1.5 text-[11px] font-bold rounded-full transition-all duration-200 cursor-pointer flex-shrink-0 ${
                 activeCategory === cat.id
                   ? "bg-[#3182f6] text-white shadow-sm"
-                  : "bg-white text-[#4e5968] hover:text-[#191f28] hover:bg-[#f2f4f6] border border-[#e5e8eb]"
+                  : "bg-[#f2f4f6] text-[#4e5968] hover:text-[#191f28] border border-transparent"
               }`}
             >
               {cat.label}
@@ -74,68 +72,67 @@ export const MenuSelector: React.FC<MenuSelectorProps> = ({ onCheckout }) => {
           ))}
         </div>
 
-        {/* Menu Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Scrollable Menu Items Container (HEIGHT LIMIT AT 270px) */}
+        <div className="h-[270px] overflow-y-auto pr-1 space-y-3.5 scrollbar-thin">
           {filteredMenu.map((item) => {
             const cartItem = cart.find((i) => i.id === item.id);
             return (
               <div
                 key={item.id}
-                className="group relative overflow-hidden rounded-[20px] border border-[#e5e8eb] bg-white hover:bg-[#f9fafb] hover:border-[#3182f6]/20 transition-all duration-300 flex flex-col toss-shadow"
+                className="group relative overflow-hidden rounded-xl border border-[#e5e8eb] bg-white p-3 flex gap-3 toss-shadow transition-colors duration-200 hover:bg-[#f9fafb]"
               >
                 {/* Image */}
-                <div className="relative h-44 w-full overflow-hidden bg-stone-100">
+                <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-102"
+                    className="h-full w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
-                  
-                  {/* Category Tag */}
-                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold px-2 py-0.5 rounded-lg text-white">
+                  <span className="absolute top-1 left-1 bg-black/60 text-[8px] font-bold px-1 py-0.5 rounded text-white">
                     {categories.find((c) => c.id === item.category)?.label}
                   </span>
                 </div>
 
                 {/* Content */}
-                <div className="p-5 flex flex-col flex-grow">
-                  <h4 className="text-base font-bold text-[#191f28] group-hover:text-[#3182f6] transition-colors duration-200">
-                    {item.name}
-                  </h4>
-                  <p className="text-xs text-[#4e5968] mt-1.5 line-clamp-2 flex-grow leading-relaxed">
-                    {item.description}
-                  </p>
+                <div className="flex flex-col justify-between flex-grow min-w-0">
+                  <div>
+                    <h4 className="text-xs font-bold text-[#191f28] truncate">
+                      {item.name}
+                    </h4>
+                    <p className="text-[10px] text-[#8b95a1] mt-0.5 line-clamp-2 leading-tight">
+                      {item.description}
+                    </p>
+                  </div>
                   
-                  <div className="mt-5 flex items-center justify-between">
-                    <span className="text-sm font-bold text-[#3182f6]">
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[11px] font-extrabold text-[#3182f6]">
                       {formatPrice(item.price)}
                     </span>
 
                     {cartItem ? (
-                      <div className="flex items-center gap-2 bg-[#f2f4f6] rounded-xl border border-transparent px-1.5 py-0.5">
+                      <div className="flex items-center gap-1.5 bg-[#f2f4f6] rounded-lg px-1 py-0.5">
                         <button
                           onClick={() => updateCartQuantity(item.id, cartItem.quantity - 1)}
-                          className="p-1.5 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
+                          className="p-1 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-2.5 w-2.5" />
                         </button>
-                        <span className="text-xs font-bold text-[#191f28] px-1">
+                        <span className="text-[10px] font-bold text-[#191f28]">
                           {cartItem.quantity}
                         </span>
                         <button
                           onClick={() => addToCart(item)}
-                          className="p-1.5 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
+                          className="p-1 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-2.5 w-2.5" />
                         </button>
                       </div>
                     ) : (
                       <button
                         onClick={() => addToCart(item)}
-                        className="rounded-xl bg-[#e8f3ff] hover:bg-[#d0e6ff] text-[#3182f6] px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5"
+                        className="rounded-lg bg-[#e8f3ff] hover:bg-[#d0e6ff] text-[#3182f6] px-3 py-1.5 text-[10px] font-bold transition-all duration-200 cursor-pointer flex items-center gap-1"
                       >
-                        <ShoppingBag className="h-3.5 w-3.5" />
+                        <Plus className="h-2.5 w-2.5" />
                         담기
                       </button>
                     )}
@@ -147,132 +144,128 @@ export const MenuSelector: React.FC<MenuSelectorProps> = ({ onCheckout }) => {
         </div>
       </div>
 
-      {/* Right Column: Order Summary (Cart) */}
-      <div className="lg:col-span-1">
-        <div className="sticky top-6 rounded-[22px] bg-white p-6 toss-shadow border border-[#f2f4f6] flex flex-col min-h-[580px] justify-between">
-          <div className="space-y-5">
-            <h3 className="text-base font-bold text-[#191f28] flex items-center gap-2 border-b border-[#e5e8eb] pb-3">
-              <ShoppingBag className="h-5 w-5 text-[#3182f6]" />
-              선택한 코스 메뉴
-            </h3>
-
-            {/* 1. TOP BOX: Scrollable Cart List */}
-            <div className="border border-[#e5e8eb] rounded-xl bg-[#f9fafb] p-3">
-              <div className="text-[10px] text-[#8b95a1] font-bold uppercase tracking-wider mb-2.5 px-1">
-                주문 요리 목록 (스크롤)
-              </div>
-              
-              {cart.length === 0 ? (
-                <div className="h-32 flex flex-col items-center justify-center text-center">
-                  <ShoppingBag className="h-8 w-8 text-[#8b95a1] mb-2" />
-                  <p className="text-xs text-[#8b95a1] font-semibold">선택한 메뉴가 없습니다.</p>
-                </div>
-              ) : (
-                <div className="max-h-48 overflow-y-auto pr-1 space-y-2">
-                  {cart.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-[#e5e8eb]"
-                    >
-                      <div className="flex-grow pr-2 min-w-0">
-                        <h5 className="text-xs font-bold text-[#191f28] truncate break-keep">{item.name}</h5>
-                        <span className="text-[10px] text-[#4e5968] font-semibold block mt-0.5">
-                          {formatPrice(item.price)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="flex items-center gap-1 bg-[#f2f4f6] px-1 py-0.5 rounded-lg">
-                          <button
-                            onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
-                            className="p-0.5 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
-                          >
-                            <Minus className="h-2 w-2" />
-                          </button>
-                          <span className="text-[10px] font-bold text-[#191f28]">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
-                            className="p-0.5 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
-                          >
-                            <Plus className="h-2 w-2" />
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="p-0.5 text-[#8b95a1] hover:text-red-500 transition-colors cursor-pointer"
-                          aria-label="삭제"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+      {/* 2. LOWER SECTION: Selected Course Menu & Booking Info (No min-height, perfectly fit) */}
+      <div className="rounded-2xl bg-white p-4.5 border border-[#f2f4f6] toss-shadow space-y-4">
+        
+        {/* Selected Course List Box */}
+        <div>
+          <h4 className="text-xs font-bold text-[#191f28] flex items-center gap-1.5 border-b border-[#f2f4f6] pb-2">
+            <ShoppingBag className="h-4 w-4 text-[#3182f6]" />
+            선택한 코스 메뉴
+          </h4>
+          
+          {cart.length === 0 ? (
+            <div className="py-6 flex flex-col items-center justify-center text-center">
+              <ShoppingBag className="h-6 w-6 text-[#8b95a1] mb-1.5" />
+              <p className="text-[10px] text-[#8b95a1] font-semibold">아직 선택한 메뉴가 없습니다.</p>
             </div>
-
-            {/* 2. BOTTOM BOX: Reservation Details Summary */}
-            <div className="border border-[#e5e8eb] rounded-xl bg-[#f9fafb] p-3.5 space-y-3">
-              <div className="text-[10px] text-[#8b95a1] font-bold uppercase tracking-wider border-b border-[#e5e8eb] pb-2">
-                지정한 예약 일정 정보
-              </div>
-
-              {isReservationReady ? (
-                <div className="space-y-2 text-xs font-semibold">
-                  <div className="flex justify-between">
-                    <span className="text-[#4e5968]">예약 일정</span>
-                    <span className="text-[#191f28] whitespace-nowrap">{bookingDate} | {bookingTime}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#4e5968]">방문 인원</span>
-                    <span className="text-[#191f28] whitespace-nowrap">{bookingGuests}명</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#4e5968]">지정 좌석</span>
-                    <span className="text-[#3182f6] truncate max-w-[150px] break-keep text-right font-bold">
-                      {TABLES.find(t => t.id === selectedTableId)?.name}
+          ) : (
+            /* Selected list box (Height limit at 105px to fit one screen) */
+            <div className="max-h-[105px] overflow-y-auto pr-1 space-y-2 mt-2 scrollbar-thin">
+              {cart.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-2 rounded-lg bg-[#f9fafb] border border-[#e5e8eb]"
+                >
+                  <div className="flex-grow pr-2 min-w-0">
+                    <h5 className="text-[11px] font-bold text-[#191f28] truncate">{item.name}</h5>
+                    <span className="text-[9px] text-[#8b95a1] font-semibold block mt-0.5">
+                      {formatPrice(item.price)}
                     </span>
                   </div>
-                </div>
-              ) : (
-                <div className="text-[11px] text-amber-600 font-bold leading-relaxed break-keep">
-                  ⚠️ 상단의 방문 날짜, 시간 및 좌석 지정을 모두 완료하셔야 결제가 가능합니다.
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* 3. FINAL CHECKOUT BOTTOM FOOTER */}
-          <div className="border-t border-[#e5e8eb] pt-4 mt-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-[#4e5968] font-bold">총 주문 금액</span>
-              <span className="text-base font-bold text-[#3182f6]">
-                {formatPrice(getCartTotal())}
-              </span>
-            </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-1 bg-white px-1 py-0.5 rounded border border-[#e5e8eb]">
+                      <button
+                        onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                        className="p-0.5 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
+                      >
+                        <Minus className="h-2 w-2" />
+                      </button>
+                      <span className="text-[9px] font-bold text-[#191f28]">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                        className="p-0.5 text-[#4e5968] hover:text-[#191f28] transition-colors cursor-pointer"
+                      >
+                        <Plus className="h-2 w-2" />
+                      </button>
+                    </div>
 
-            {isReservationReady && cart.length > 0 ? (
-              <button
-                onClick={onCheckout}
-                className="w-full rounded-xl bg-[#3182f6] hover:bg-[#1b64da] text-white py-3.5 text-sm font-bold tracking-wide shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"
-              >
-                예약 및 결제하기
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            ) : (
-              <button
-                disabled
-                className="w-full rounded-xl bg-[#e5e8eb] text-[#8b95a1] py-3.5 text-xs font-bold cursor-not-allowed text-center"
-              >
-                {cart.length === 0 ? "메뉴 코스를 담아주세요" : "예약 조건을 지정해주세요"}
-              </button>
-            )}
-          </div>
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="p-0.5 text-[#8b95a1] hover:text-red-500 transition-colors cursor-pointer"
+                      aria-label="삭제"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Selected Booking Info Box */}
+        <div className="bg-[#f9fafb] border border-[#e5e8eb] rounded-xl p-3 space-y-2.5 text-[11px] font-semibold">
+          <div className="text-[9px] text-[#8b95a1] font-bold uppercase tracking-wider border-b border-[#e5e8eb] pb-1.5">
+            예약 일정 요약
+          </div>
+          
+          {isReservationReady ? (
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-[#8b95a1]">예약 일정</span>
+                <span className="text-[#191f28] font-bold">{bookingDate} | {bookingTime}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#8b95a1]">예약 인원</span>
+                <span className="text-[#191f28] font-bold">{bookingGuests}명</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#8b95a1]">지정 좌석</span>
+                <span className="text-[#3182f6] font-bold">
+                  {TABLES.find(t => t.id === selectedTableId)?.name}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="text-[9.5px] text-amber-600 font-bold leading-normal break-keep">
+              ⚠️ 상단 일정 및 좌석 지정을 완료하셔야 예약 접수가 활성화됩니다.
+            </div>
+          )}
+        </div>
+
+        {/* Total Price & Action Box */}
+        <div className="border-t border-[#e5e8eb] pt-3.5 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] text-[#8b95a1] font-bold block">총 주문 금액</span>
+            <span className="text-sm font-extrabold text-[#3182f6] block">
+              {formatPrice(getCartTotal())}
+            </span>
+          </div>
+
+          {isReservationReady && cart.length > 0 ? (
+            <button
+              onClick={onCheckout}
+              className="rounded-xl bg-[#3182f6] hover:bg-[#1b64da] text-white px-5 py-3 text-xs font-bold tracking-wide shadow-md active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer"
+            >
+              예약 및 결제하기
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          ) : (
+            <button
+              disabled
+              className="rounded-xl bg-[#e5e8eb] text-[#8b95a1] px-4 py-3 text-[10px] font-bold cursor-not-allowed text-center"
+            >
+              {cart.length === 0 ? "메뉴를 담아주세요" : "예약을 확정해주세요"}
+            </button>
+          )}
+        </div>
+
       </div>
+
     </div>
   );
 };

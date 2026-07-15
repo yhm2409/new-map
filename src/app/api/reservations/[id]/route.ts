@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// PATCH: Update reservation status (승인/거절)
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -30,6 +31,39 @@ export async function PATCH(
     console.error("Update reservation status error:", error);
     return NextResponse.json(
       { success: false, message: "예약 상태 수정 중 서버 에러가 발생했습니다." },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Terminate and delete reservation physically from DB
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: "예약 ID가 누락되었습니다." },
+        { status: 400 }
+      );
+    }
+
+    // Delete reservation. Associated ReservationItems will be deleted cascadingly by DB foreign key setup.
+    await prisma.reservation.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "예약 내역이 데이터베이스에서 완전히 삭제되었습니다.",
+    });
+  } catch (error: any) {
+    console.error("Delete reservation error:", error);
+    return NextResponse.json(
+      { success: false, message: "예약 삭제 중 서버 에러가 발생했습니다." },
       { status: 500 }
     );
   }

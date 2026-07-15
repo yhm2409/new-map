@@ -2,11 +2,18 @@
 
 import React, { useState } from "react";
 import { useApp } from "@/context/AppContext";
-import { Check, X, Users, CreditCard, Clock, Calendar, CheckSquare, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, X, Users, CreditCard, Clock, Calendar, CheckSquare, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { TABLES } from "./SeatMap";
 
 export const AdminDashboard: React.FC = () => {
-  const { reservations, updateReservationStatus } = useApp();
+  const { reservations, updateReservationStatus, deleteReservation } = useApp();
+  
+  const handleDeleteClick = async (id: string) => {
+    if (confirm("이 예약 내역을 데이터베이스에서 영구적으로 삭제하시겠습니까?\n삭제된 내용은 고객의 예약 확인 화면에서도 즉시 지워집니다.")) {
+      await deleteReservation(id);
+    }
+  };
+
   const [filter, setFilter] = useState<"all" | "대기" | "승인" | "거절">("all");
   const [expandedResId, setExpandedResId] = useState<string | null>(null);
 
@@ -172,13 +179,24 @@ export const AdminDashboard: React.FC = () => {
                         </button>
                       </div>
                     ) : (
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        res.status === "승인"
-                          ? "bg-emerald-50 border border-emerald-100 text-emerald-600"
-                          : "bg-red-50 border border-red-100 text-red-500"
-                      }`}>
-                        {res.status === "승인" ? "승인 완료" : "거절 완료"}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          res.status === "승인"
+                            ? "bg-emerald-50 border border-emerald-100 text-emerald-600"
+                            : "bg-red-50 border border-red-100 text-red-500"
+                        }`}>
+                          {res.status === "승인" ? "승인 완료" : "거절 완료"}
+                        </span>
+                        
+                        <button
+                          onClick={() => handleDeleteClick(res.id)}
+                          className="flex items-center gap-1.5 rounded-lg bg-red-50 hover:bg-red-500 text-red-500 hover:text-white border border-transparent px-3.5 py-2 text-xs font-bold transition-all cursor-pointer shadow-sm"
+                          title="예약 영구 삭제"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          삭제
+                        </button>
+                      </div>
                     )}
 
                     <button
