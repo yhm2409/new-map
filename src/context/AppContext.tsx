@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 export interface User {
   id: string;
   name: string;
+  role: string;
 }
 
 export interface CartItem {
@@ -41,8 +42,8 @@ interface AppContextType {
   // Auth
   user: User | null;
   isAdmin: boolean;
-  login: (id: string, pw: string) => { success: boolean; message: string };
-  signup: (id: string, name: string, pw: string) => { success: boolean; message: string };
+  login: (id: string, pw: string) => Promise<{ success: boolean; message: string }>;
+  signup: (id: string, name: string, pw: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   toggleAdminMode: () => void;
 
@@ -64,10 +65,13 @@ interface AppContextType {
   clearCart: () => void;
   getCartTotal: () => number;
 
-  // Reservations
+  // Reservations & Realtime table block
   reservations: Reservation[];
-  addReservation: () => { success: boolean; reservationId: string };
-  updateReservationStatus: (reservationId: string, status: "승인" | "거절") => void;
+  reservedTableIds: string[];
+  fetchReservedTables: () => Promise<void>;
+  addReservation: () => Promise<{ success: boolean; reservationId: string }>;
+  updateReservationStatus: (reservationId: string, status: "승인" | "거절") => Promise<void>;
+  refreshReservations: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -124,48 +128,11 @@ export const MOCK_MENU: MenuItem[] = [
   }
 ];
 
-// Initial reservations to display on load
-const INITIAL_RESERVATIONS: Reservation[] = [
-  {
-    id: "RES-1001",
-    userId: "user123",
-    userName: "김민수",
-    date: "2026-07-20",
-    time: "18:00",
-    guests: 2,
-    tableId: "2",
-    items: [
-      { id: "m3", name: "드라이 에이징 티본 스테이크", price: 89000, quantity: 1 },
-      { id: "m6", name: "나파 밸리 카베르네 소비뇽", price: 95000, quantity: 1 }
-    ],
-    totalPrice: 184000,
-    status: "승인",
-    createdAt: "2026-07-15T12:00:00.000Z"
-  },
-  {
-    id: "RES-1002",
-    userId: "guest456",
-    userName: "이서연",
-    date: "2026-07-22",
-    time: "19:30",
-    guests: 4,
-    tableId: "5",
-    items: [
-      { id: "m1", name: "트러플 크림 아란치니", price: 18000, quantity: 2 },
-      { id: "m4", name: "비스크 소스 랍스터 파스타", price: 36000, quantity: 2 }
-    ],
-    totalPrice: 108000,
-    status: "대기",
-    createdAt: "2026-07-15T14:30:00.000Z"
-  }
-];
-
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [users, setUsers] = useState<{ id: string; name: string; pw: string }[]>([]);
 
-  // Reservation state
+  // Reservation Form State
   const [bookingDate, setBookingDate] = useState<string>("");
   const [bookingTime, setBookingTime] = useState<string>("");
   const [bookingGuests, setBookingGuests] = useState<number>(2);
@@ -174,50 +141,112 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Cart
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Reservations
-  const [reservations, setReservations] = useState<Reservation[]>(INITIAL_RESERVATIONS);
+  // Reservations from DB
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservedTableIds, setReservedTableIds] = useState<string[]>([]);
 
-  // Load user and data from localStorage (optional persistence helper)
+  // Session persistence on client
   useEffect(() => {
-    const savedUsers = localStorage.getItem("luxury_users");
-    if (savedUsers) setUsers(JSON.parse(savedUsers));
-
-    const savedReservations = localStorage.getItem("luxury_reservations");
-    if (savedReservations) {
-      setReservations(JSON.parse(savedReservations));
-    } else {
-      localStorage.setItem("luxury_reservations", JSON.stringify(INITIAL_RESERVATIONS));
+    const savedUser = localStorage.getItem("larome_user");
+    if (savedUser) {
+      const parsed = JSON.parse(savedUser);
+      setUser(parsed);
+      if (parsed.role === "admin") {
+        setIsAdmin(true);
+      }
     }
   }, []);
 
-  const login = (id: string, pw: string) => {
-    const foundUser = users.find((u) => u.id === id && u.pw === pw);
-    if (foundUser) {
-      setUser({ id: foundUser.id, name: foundUser.name });
-      return { success: true, message: "성공적으로 로그인되었습니다." };
+  // Fetch reserved tables for SeatMap check when bookingDate/bookingTime change
+  const fetchReservedTables = async () => {
+    if (!bookingDate || !bookingTime) {
+      setReservedTableIds([]);
+      return;
     }
-    // Default mock user check
-    if (id === "user" && pw === "password") {
-      const defaultUser = { id: "user", name: "테스터" };
-      setUser(defaultUser);
-      return { success: true, message: "기본 테스트 계정으로 로그인되었습니다." };
+    try {
+      const res = await fetch(`/api/reservations?date=${bookingDate}&time=${bookingTime}`);
+      const data = await res.json();
+      if (data.success) {
+        setReservedTableIds(data.reservedTableIds);
+      }
+    } catch (err) {
+      console.error("Failed to fetch reserved tables:", err);
     }
-    return { success: false, message: "아이디 또는 비밀번호가 일치하지 않습니다." };
   };
 
-  const signup = (id: string, name: string, pw: string) => {
-    if (id === "user" || users.some((u) => u.id === id)) {
-      return { success: false, message: "이미 사용 중인 아이디입니다." };
+  useEffect(() => {
+    fetchReservedTables();
+  }, [bookingDate, bookingTime]);
+
+  // Fetch reservation list based on user mode
+  const refreshReservations = async () => {
+    try {
+      let url = "";
+      if (isAdmin) {
+        url = "/api/reservations/admin";
+      } else if (user) {
+        url = `/api/reservations/my?userId=${user.id}`;
+      } else {
+        setReservations([]);
+        return;
+      }
+
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        setReservations(data.reservations);
+      }
+    } catch (err) {
+      console.error("Failed to fetch reservations:", err);
     }
-    const newUserList = [...users, { id, name, pw }];
-    setUsers(newUserList);
-    localStorage.setItem("luxury_users", JSON.stringify(newUserList));
-    return { success: true, message: "회원가입이 완료되었습니다. 로그인해 주세요." };
+  };
+
+  useEffect(() => {
+    refreshReservations();
+  }, [user, isAdmin]);
+
+  const login = async (id: string, pw: string) => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginId: id, password: pw }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem("larome_user", JSON.stringify(data.user));
+        if (data.user.role === "admin") {
+          setIsAdmin(true);
+        }
+        return { success: true, message: data.message };
+      }
+      return { success: false, message: data.message };
+    } catch (err) {
+      console.error("Login client error:", err);
+      return { success: false, message: "로그인 진행 중 에러가 발생했습니다." };
+    }
+  };
+
+  const signup = async (id: string, name: string, pw: string) => {
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginId: id, name, password: pw }),
+      });
+      const data = await res.json();
+      return { success: data.success, message: data.message };
+    } catch (err) {
+      console.error("Signup client error:", err);
+      return { success: false, message: "회원가입 진행 중 에러가 발생했습니다." };
+    }
   };
 
   const logout = () => {
     setUser(null);
     setIsAdmin(false);
+    localStorage.removeItem("larome_user");
   };
 
   const toggleAdminMode = () => {
@@ -252,41 +281,57 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const addReservation = () => {
+  const addReservation = async () => {
     if (!user || !bookingDate || !bookingTime || !selectedTableId) {
       return { success: false, reservationId: "" };
     }
 
-    const reservationId = `RES-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newReservation: Reservation = {
-      id: reservationId,
-      userId: user.id,
-      userName: user.name,
-      date: bookingDate,
-      time: bookingTime,
-      guests: bookingGuests,
-      tableId: selectedTableId,
-      items: [...cart],
-      totalPrice: getCartTotal(),
-      status: "대기",
-      createdAt: new Date().toISOString()
-    };
-
-    const newReservations = [newReservation, ...reservations];
-    setReservations(newReservations);
-    localStorage.setItem("luxury_reservations", JSON.stringify(newReservations));
-
-    // Reset reservation selections
-    setSelectedTableId(null);
-    clearCart();
-
-    return { success: true, reservationId };
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          userName: user.name,
+          date: bookingDate,
+          time: bookingTime,
+          guests: bookingGuests,
+          tableId: selectedTableId,
+          items: cart,
+          totalPrice: getCartTotal(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSelectedTableId(null);
+        clearCart();
+        await refreshReservations();
+        await fetchReservedTables(); // refresh SeatMap immediately
+        return { success: true, reservationId: data.reservationId };
+      }
+      return { success: false, reservationId: "" };
+    } catch (err) {
+      console.error("Add reservation client error:", err);
+      return { success: false, reservationId: "" };
+    }
   };
 
-  const updateReservationStatus = (reservationId: string, status: "승인" | "거절") => {
-    const updated = reservations.map((res) => (res.id === reservationId ? { ...res, status } : res));
-    setReservations(updated);
-    localStorage.setItem("luxury_reservations", JSON.stringify(updated));
+  const updateReservationStatus = async (reservationId: string, status: "승인" | "거절") => {
+    try {
+      const res = await fetch(`/api/reservations/${reservationId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await refreshReservations();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error("Update status client error:", err);
+    }
   };
 
   return (
@@ -313,8 +358,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearCart,
         getCartTotal,
         reservations,
+        reservedTableIds,
+        fetchReservedTables,
         addReservation,
-        updateReservationStatus
+        updateReservationStatus,
+        refreshReservations
       }}
     >
       {children}

@@ -28,20 +28,10 @@ export const SeatMap: React.FC = () => {
     bookingGuests,
     selectedTableId,
     setSelectedTableId,
-    reservations
+    reservedTableIds
   } = useApp();
 
   const isDateTimeSelected = bookingDate !== "" && bookingTime !== "";
-
-  // Check which tables are already reserved for the selected date and time
-  const getReservedTableIds = () => {
-    if (!isDateTimeSelected) return [];
-    return reservations
-      .filter((res) => res.date === bookingDate && res.time === bookingTime && res.status !== "거절")
-      .map((res) => res.tableId);
-  };
-
-  const reservedTableIds = getReservedTableIds();
 
   const handleTableSelect = (table: TableInfo) => {
     if (!isDateTimeSelected) return;

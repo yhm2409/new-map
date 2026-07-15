@@ -64,8 +64,8 @@ export const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
       setLoadingText("가상 거래 전자 영수증 발급 중...");
     }, 2000);
 
-    setTimeout(() => {
-      const res = addReservation();
+    setTimeout(async () => {
+      const res = await addReservation();
       if (res.success) {
         setCreatedResId(res.reservationId);
         setStep("success");

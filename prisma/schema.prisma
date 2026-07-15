@@ -1,0 +1,45 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  loginId      String        @unique
+  name         String
+  password     String
+  role         String        @default("user") // "user" (고객), "admin" (사장님)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reservations Reservation[]
+}
+
+model Reservation {
+  id         String            @id @default(uuid())
+  userId     String
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userName   String
+  date       String            // YYYY-MM-DD
+  time       String            // HH:MM
+  guests     Int
+  tableId    String
+  totalPrice Int               @default(0)
+  status     String            @default("대기") // "대기", "승인", "거절"
+  createdAt  DateTime          @default(now())
+  items      ReservationItem[]
+}
+
+model ReservationItem {
+  id            String      @id @default(uuid())
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  menuId        String
+  menuName      String
+  price         Int
+  quantity      Int
+}

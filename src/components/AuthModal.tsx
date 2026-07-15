@@ -20,7 +20,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
@@ -31,7 +31,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
 
     if (isLoginTab) {
-      const res = login(id, password);
+      const res = await login(id, password);
       if (res.success) {
         setSuccessMsg(res.message);
         setTimeout(() => {
@@ -43,7 +43,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         setErrorMsg(res.message);
       }
     } else {
-      const res = signup(id, name, password);
+      const res = await signup(id, name, password);
       if (res.success) {
         setSuccessMsg(res.message);
         setTimeout(() => {
