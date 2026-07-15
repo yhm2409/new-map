@@ -12,7 +12,7 @@ export const CinemaChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "안녕하세요! **라롬 시네마 AI 컨시어지**입니다. 영화 정보, 상영 시간표, 상영관 좌석 및 극장 시설 등에 대해 무엇이든 편하게 물어보세요! 😊"
+      content: "안녕하세요! **라롬 파인다이닝 AI 컨시어지**입니다. 레스토랑 메뉴 구성, 좌석 테이블 혜택, 영업 시간 및 무료 주차 서비스에 대해 무엇이든 편하게 물어보세요! 🍽️"
     }
   ]);
   const [input, setInput] = useState("");
@@ -22,9 +22,9 @@ export const CinemaChat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickQuestions = [
-    { text: "🎬 상영 영화와 시간표가 궁금해요", query: "현재 상영 중인 영화 정보와 전체 상영 시간표를 알려주세요." },
-    { text: "🛋️ 상영관 좌석과 요금은 얼마인가요?", query: "1관 Premium Screen과 2관 Suite Lounge의 좌석 구조와 관람 요금을 비교해 주세요." },
-    { text: "📍 극장 위치와 주차 혜택을 알려줘", query: "라롬 시네마 강남의 상세 위치와 무료 주차 혜택 및 발레파킹 요금을 알고 싶어요." }
+    { text: "🍽️ 레스토랑 코스 요리 구성 알려줘", query: "라롬 파인다이닝 레스토랑의 코스 요리 메뉴판과 대표 스테이크 정보를 자세히 알고 싶어요." },
+    { text: "🍷 창가석, 룸 좌석 종류와 예약 팁", query: "2단계 좌석 맵에 있는 창가석, 프라이빗 룸, 홀 테이블 구조와 특징을 알려주세요." },
+    { text: "📍 식당 위치와 발레파킹 무료 안내", query: "청담동 라롬 레스토랑의 상세 오시는 길과 무료 발레파킹 이용 규칙이 어떻게 되나요?" }
   ];
 
   const scrollToBottom = () => {
@@ -45,7 +45,6 @@ export const CinemaChat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Prepare message chain for api
       const apiMessages = [...messages, newMsg].map((m) => ({
         role: m.role,
         content: m.content
@@ -72,7 +71,6 @@ export const CinemaChat: React.FC = () => {
     }
   };
 
-  // Convert markdown bold to JSX bold dynamically (Simple Parser helper)
   const renderMessageContent = (content: string) => {
     const parts = content.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
@@ -93,7 +91,7 @@ export const CinemaChat: React.FC = () => {
             <Sparkles className="h-4.5 w-4.5 animate-pulse" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-[#191f28]">라롬 시네마 AI 챗봇</h4>
+            <h4 className="text-xs font-bold text-[#191f28]">라롬 레스토랑 AI 챗봇</h4>
             <span className="text-[9px] text-[#3182f6] font-bold block mt-0.5 flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 block animate-ping" />
               GROQ Llama-3.3 실시간 상담 중
@@ -124,7 +122,7 @@ export const CinemaChat: React.FC = () => {
           );
         })}
 
-        {/* LOADING ANTIMATION Bubble */}
+        {/* LOADING Bubble */}
         {isLoading && (
           <div className="flex justify-start animate-fade-in">
             <div className="bg-white text-[#8b95a1] rounded-[18px] rounded-tl-none border border-[#f2f4f6] p-3 toss-shadow flex items-center gap-1">
@@ -135,7 +133,7 @@ export const CinemaChat: React.FC = () => {
           </div>
         )}
 
-        {/* ERROR MESSAGE Bubble */}
+        {/* ERROR Bubble */}
         {error && (
           <div className="flex justify-center text-center p-2">
             <div className="bg-red-50 border border-red-100 text-red-500 rounded-xl p-2.5 text-[10px] font-bold flex items-center gap-1.5 toss-shadow">
@@ -168,7 +166,7 @@ export const CinemaChat: React.FC = () => {
         </div>
       )}
 
-      {/* 4. INPUT INPUT BOX */}
+      {/* 4. INPUT BOX */}
       <div className="bg-white border-t border-[#f2f4f6] p-3 flex gap-2">
         <input
           type="text"
@@ -180,7 +178,7 @@ export const CinemaChat: React.FC = () => {
             }
           }}
           disabled={isLoading}
-          placeholder="영화관 관련 질문을 입력하세요..."
+          placeholder="레스토랑 예약 관련 질문을 입력하세요..."
           className="flex-grow rounded-xl bg-[#f2f4f6] border border-transparent px-4 py-3 text-xs text-[#191f28] focus:bg-white focus:border-[#3182f6] focus:outline-none transition-all disabled:opacity-70 font-semibold"
         />
         <button

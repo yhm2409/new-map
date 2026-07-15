@@ -302,7 +302,7 @@ export default function Home() {
               )}
 
               {activeTab === "cinema-chat" && (
-                /* 탭 3: AI 시네마 챗봇 */
+                /* 탭 3: AI 레스토랑 챗봇 */
                 <div className="animate-fade-in flex-grow flex flex-col justify-start">
                   <CinemaChat />
                 </div>
@@ -330,7 +330,7 @@ export default function Home() {
                   {[
                     { stepNum: 1, label: "일정 및 인원" },
                     { stepNum: 2, label: "좌석 지정" },
-                    { stepNum: 3, label: "관람권 선택" }
+                    { stepNum: 3, label: "메뉴 선택" }
                   ].map((s) => {
                     const isCompleted = bookingStep > s.stepNum;
                     const isActive = bookingStep === s.stepNum;
@@ -370,9 +370,9 @@ export default function Home() {
                   <div className="rounded-xl bg-white p-4 border border-[#f2f4f6] toss-shadow space-y-4 animate-fade-in text-left">
                     <div>
                       <h3 className="text-sm font-bold text-[#191f28]">
-                        1. 상영 일정 및 관람 인원 선택
+                        1. 방문 일정 및 인원 선택
                       </h3>
-                      <p className="text-[10px] text-[#8b95a1] mt-0.5">영화 상영 일시와 관람하실 인원수를 선택해 주세요.</p>
+                      <p className="text-[10px] text-[#8b95a1] mt-0.5">방문 일시와 동반하실 인원수를 골라주세요.</p>
                     </div>
                     
                     <div className="space-y-4 pt-1">
@@ -401,7 +401,7 @@ export default function Home() {
                             onChange={(e) => setBookingTime(e.target.value)}
                             className="w-full rounded-xl border border-transparent bg-[#f2f4f6] py-3 px-3.5 text-xs text-[#191f28] focus:bg-white focus:border-[#3182f6] focus:outline-none transition-all appearance-none cursor-pointer font-semibold"
                           >
-                            <option value="">상영 시간을 골라주세요</option>
+                            <option value="">방문 시간을 골라주세요</option>
                             {times.map((t) => (
                               <option key={t} value={t}>
                                 {t}
@@ -415,7 +415,7 @@ export default function Home() {
                       {/* Guests */}
                       <div>
                         <label className="block text-[10px] font-bold text-[#4e5968] mb-1.5 pl-0.5">
-                          관람 인원
+                          방문 인원
                         </label>
                         <div className="relative">
                           <select
@@ -423,7 +423,7 @@ export default function Home() {
                             onChange={(e) => setBookingGuests(Number(e.target.value))}
                             className="w-full rounded-xl border border-transparent bg-[#f2f4f6] py-3 px-3.5 text-xs text-[#191f28] focus:bg-white focus:border-[#3182f6] focus:outline-none transition-all appearance-none cursor-pointer font-semibold"
                           >
-                            {[1, 2, 3, 4, 5, 6].map((num) => (
+                            {[2, 3, 4, 5, 6].map((num) => (
                               <option key={num} value={num}>
                                 {num}명
                               </option>
@@ -521,7 +521,7 @@ export default function Home() {
               <span className="text-[9px] font-extrabold">내 예약</span>
             </button>
 
-            {/* Tab 3: 시네마 AI 챗봇 */}
+            {/* Tab 3: 레스토랑 AI 챗봇 */}
             <button
               onClick={() => {
                 setActiveTab("cinema-chat");
