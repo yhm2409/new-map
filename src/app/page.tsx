@@ -578,3 +578,5 @@ export default function Home() {
     </div>
   );
 }
+
+// Trigger Vercel Auto-Redeploy to apply newly registered GROQ_API_KEY environment variable.
