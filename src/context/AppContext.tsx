@@ -152,9 +152,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (savedUser) {
       const parsed = JSON.parse(savedUser);
       setUser(parsed);
-      if (parsed.role === "admin") {
-        setIsAdmin(true);
-      }
     }
   }, []);
 
@@ -217,9 +214,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("larome_user", JSON.stringify(data.user));
-        if (data.user.role === "admin") {
-          setIsAdmin(true);
-        }
         return { success: true, message: data.message };
       }
       return { success: false, message: data.message };

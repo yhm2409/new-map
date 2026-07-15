@@ -82,7 +82,7 @@ export const CinemaChat: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[560px] bg-[#f2f4f6] rounded-2xl overflow-hidden border border-[#e5e8eb] toss-shadow animate-fade-in text-left">
+    <div className="flex flex-col h-[525px] bg-[#f2f4f6] overflow-hidden animate-fade-in text-left">
       
       {/* 1. CHAT HEADER */}
       <div className="bg-white border-b border-[#f2f4f6] px-4 py-3 flex items-center justify-between">
