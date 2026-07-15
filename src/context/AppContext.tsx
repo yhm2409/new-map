@@ -77,55 +77,55 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Mock Menu Items
+// MOCK_MOVIES (영화 예매 티켓 및 웰컴 푸드/음료 스펙)
 export const MOCK_MENU: MenuItem[] = [
   {
-    id: "m1",
-    name: "트러플 크림 아란치니",
-    price: 18000,
-    description: "블랙 트러플 향이 은은하게 퍼지는 이탈리아식 튀김 주먹밥",
-    category: "appetizer",
-    image: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=500&auto=format&fit=crop&q=60"
-  },
-  {
-    id: "m2",
-    name: "시저 샐러드 & 훈제 연어",
-    price: 22000,
-    description: "로메인 레터스 위에 프리미엄 훈제 연어와 파르메산 치즈 칩을 얹은 샐러드",
-    category: "appetizer",
-    image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=500&auto=format&fit=crop&q=60"
-  },
-  {
-    id: "m3",
-    name: "드라이 에이징 티본 스테이크",
-    price: 89000,
-    description: "참나무 장작으로 구워낸 최고급 프라임 등급의 드라이 에이징 티본 스테이크 (500g)",
+    id: "mv1",
+    name: "미식의 여정 관람 티켓",
+    price: 25000,
+    description: "[다큐멘터리 / 120분 / 전체관람가] 프랑스 미쉐린 3스타 셰프들의 요리 철학과 전설적인 레시피를 조명하는 감동 다큐멘터리",
     category: "main",
     image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=60"
   },
   {
-    id: "m4",
-    name: "비스크 소스 랍스터 파스타",
-    price: 36000,
-    description: "랍스터 껍질을 우려낸 깊은 풍미의 비스크 소스와 랍스터 테일 한 마리가 올라간 링귀니 파스타",
+    id: "mv2",
+    name: "어두운 주방 관람 티켓 (Suite)",
+    price: 45000,
+    description: "[미스터리, 스릴러 / 105분 / 15세관람가] 깊은 밤 레스토랑의 비밀 주방에서 은밀히 벌어지는 사건을 추적하는 서스펜스 영화 (리클라이너 Suite관)",
     category: "main",
     image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    id: "mv3",
+    name: "라라 라롬 관람 티켓",
+    price: 25000,
+    description: "[로맨스, 뮤지컬 / 115.분 / 전체관람가] 프랑스 남부 프로방스의 아름다운 라벤더 밭과 미식 축제를 배경으로 벌어지는 뮤지컬 영화",
+    category: "main",
+    image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&auto=format&fit=crop&q=60"
+  },
+  {
+    id: "m1",
+    name: "트러플 크림 아란치니 (웰컴)",
+    price: 18000,
+    description: "블랙 트러플 향이 은은하게 퍼지는 바삭하고 고소한 프리미엄 수제 이탈리아 튀김 주먹밥",
+    category: "appetizer",
+    image: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=500&auto=format&fit=crop&q=60"
   },
   {
     id: "m5",
     name: "바닐라 브륄레 & 카라멜라이즈",
     price: 12000,
-    description: "프랑스 정통 바닐라 커스터드 크림 위에 바삭한 카라멜 층을 얹은 디저트",
+    description: "프랑스 정통 마다가스카르 바닐라 빈 커스터드 위에 바삭하고 달콤한 카라멜 라이즈 층을 얹은 디저트",
     category: "dessert",
     image: "https://images.unsplash.com/photo-1516685018646-549198525c1b?w=500&auto=format&fit=crop&q=60"
   },
   {
     id: "m6",
-    name: "나파 밸리 카베르네 소비뇽",
-    price: 95000,
-    description: "깊고 풍부한 베리 향과 묵직한 바디감이 돋보이는 캘리포니아산 프리미엄 레드 와인 (750ml)",
+    name: "카베르네 소비뇽 (웰컴 와인)",
+    price: 15000,
+    description: "묵직한 바디감과 매혹적인 붉은 베리 풍미가 조화로운 캘리포니아 나파 밸리산 프리미엄 레드 와인 (글라스)",
     category: "drink",
-    image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&auto=format&fit=crop&q=60"
+    image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=500&auto=format&fit=crop&q=60"
   }
 ];
 

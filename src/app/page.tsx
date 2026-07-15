@@ -8,7 +8,8 @@ import { MenuSelector } from "@/components/MenuSelector";
 import { MockPaymentModal } from "@/components/MockPaymentModal";
 import { UserReservations } from "@/components/UserReservations";
 import { AdminDashboard } from "@/components/AdminDashboard";
-import { Calendar, Clock, Users, User, ShieldAlert, LogOut, Sparkles, ChevronRight, ChevronLeft, MapPin, Phone, Check } from "lucide-react";
+import { CinemaChat } from "@/components/CinemaChat";
+import { Calendar, Clock, Users, User, ShieldAlert, LogOut, Sparkles, ChevronRight, ChevronLeft, MapPin, Phone, Check, MessageSquare, Ticket } from "lucide-react";
 
 export default function Home() {
   const {
@@ -31,7 +32,7 @@ export default function Home() {
   
   // bookingStep - 0: Home landing page, 1: Date/Time, 2: Seat Map, 3: Menu Pre-order
   const [bookingStep, setBookingStep] = useState<number>(0);
-  const [activeTab, setActiveTab] = useState<"book" | "my-reservations">("book");
+  const [activeTab, setActiveTab] = useState<"book" | "my-reservations" | "cinema-chat">("book");
 
   const times = ["17:00", "18:00", "19:00", "20:00", "21:00"];
 
@@ -82,7 +83,7 @@ export default function Home() {
         className={
           isAdmin
             ? "w-full flex flex-col relative"
-            : "w-full max-w-[480px] min-h-screen sm:min-h-[840px] sm:rounded-[36px] bg-white flex flex-col relative overflow-hidden shadow-2xl border border-[#e5e8eb]"
+            : "w-full max-w-[480px] min-h-screen sm:min-h-[840px] sm:rounded-[36px] bg-[#f2f4f6] flex flex-col relative overflow-hidden shadow-2xl border border-[#e5e8eb] bg-white"
         }
       >
         
@@ -184,50 +185,25 @@ export default function Home() {
         <main 
           className={
             isAdmin
-              ? "max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-start min-h-[600px] flex-grow"
-              : "flex-grow w-full px-4 py-5 flex flex-col justify-start overflow-y-auto"
+              ? "max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-start min-h-[600px] flex-grow bg-white rounded-2xl toss-shadow mt-6"
+              : `flex-grow w-full px-4 py-5 flex flex-col justify-start overflow-y-auto ${
+                  activeTab === "cinema-chat" ? "bg-[#f2f4f6]" : "bg-white"
+                }`
           }
         >
           
           {isAdmin ? (
-            /* 어드민 대시보드 (드넓은 데스크톱 화면 렌더링) */
+            /* 어드민 대시보드 */
             <div className="animate-fade-in">
               <AdminDashboard />
             </div>
           ) : bookingStep === 0 ? (
-            /* 0단계: L'ARÔME 홈 화면 랜딩 페이지 (모바일 앱 전용) */
-            <div className="space-y-6 animate-fade-in flex-grow flex flex-col justify-start">
+            /* 0단계: 홈 화면 랜딩 페이지 및 탭 스위칭 (모바일 앱) */
+            <div className="animate-fade-in flex-grow flex flex-col justify-start">
               
-              {/* Tab controls */}
-              <div className="flex border-b border-[#e5e8eb] gap-4">
-                <button
-                  onClick={() => {
-                    setActiveTab("book");
-                    setBookingStep(0);
-                  }}
-                  className={`pb-3 text-xs font-bold tracking-tight border-b-[3px] transition-all duration-200 cursor-pointer ${
-                    activeTab === "book"
-                      ? "border-[#3182f6] text-[#3182f6]"
-                      : "border-transparent text-[#8b95a1] hover:text-[#4e5968]"
-                  }`}
-                >
-                  소개 및 예약 홈
-                </button>
-                <button
-                  onClick={() => setActiveTab("my-reservations")}
-                  className={`pb-3 text-xs font-bold tracking-tight border-b-[3px] transition-all duration-200 cursor-pointer ${
-                    activeTab === "my-reservations"
-                      ? "border-[#3182f6] text-[#3182f6]"
-                      : "border-transparent text-[#8b95a1] hover:text-[#4e5968]"
-                  }`}
-                >
-                  나의 예약 현황
-                </button>
-              </div>
-
-              {activeTab === "book" ? (
-                /* Home Landing */
-                <div className="space-y-6 pt-2">
+              {activeTab === "book" && (
+                /* 탭 1: 예약 홈 */
+                <div className="space-y-6 pt-2 text-left">
                   
                   {/* Headline & Badges */}
                   <div className="space-y-4">
@@ -271,7 +247,7 @@ export default function Home() {
                       onClick={() => setActiveTab("my-reservations")}
                       className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white border border-[#e5e8eb] hover:bg-[#f2f4f6] text-[#4e5968] py-3 text-xs font-extrabold transition-all cursor-pointer toss-shadow"
                     >
-                      <User className="h-3.5 w-3.5 text-[#3182f6]" />
+                      <Ticket className="h-3.5 w-3.5 text-[#3182f6]" />
                       예약 확인하기
                     </button>
                   </div>
@@ -316,10 +292,19 @@ export default function Home() {
                   </div>
 
                 </div>
-              ) : (
-                /* 나의 예약 현황 탭 */
+              )}
+
+              {activeTab === "my-reservations" && (
+                /* 탭 2: 나의 예약 현황 */
                 <div className="animate-fade-in">
                   <UserReservations onOpenLogin={() => setIsAuthOpen(true)} />
+                </div>
+              )}
+
+              {activeTab === "cinema-chat" && (
+                /* 탭 3: AI 시네마 챗봇 */
+                <div className="animate-fade-in flex-grow flex flex-col justify-start">
+                  <CinemaChat />
                 </div>
               )}
 
@@ -345,7 +330,7 @@ export default function Home() {
                   {[
                     { stepNum: 1, label: "일정 및 인원" },
                     { stepNum: 2, label: "좌석 지정" },
-                    { stepNum: 3, label: "메뉴 선택" }
+                    { stepNum: 3, label: "관람권 선택" }
                   ].map((s) => {
                     const isCompleted = bookingStep > s.stepNum;
                     const isActive = bookingStep === s.stepNum;
@@ -385,9 +370,9 @@ export default function Home() {
                   <div className="rounded-xl bg-white p-4 border border-[#f2f4f6] toss-shadow space-y-4 animate-fade-in text-left">
                     <div>
                       <h3 className="text-sm font-bold text-[#191f28]">
-                        1. 방문 일정 및 인원 선택
+                        1. 상영 일정 및 관람 인원 선택
                       </h3>
-                      <p className="text-[10px] text-[#8b95a1] mt-0.5">방문 일시와 동반하실 인원수를 골라주세요.</p>
+                      <p className="text-[10px] text-[#8b95a1] mt-0.5">영화 상영 일시와 관람하실 인원수를 선택해 주세요.</p>
                     </div>
                     
                     <div className="space-y-4 pt-1">
@@ -416,7 +401,7 @@ export default function Home() {
                             onChange={(e) => setBookingTime(e.target.value)}
                             className="w-full rounded-xl border border-transparent bg-[#f2f4f6] py-3 px-3.5 text-xs text-[#191f28] focus:bg-white focus:border-[#3182f6] focus:outline-none transition-all appearance-none cursor-pointer font-semibold"
                           >
-                            <option value="">방문 시간을 골라주세요</option>
+                            <option value="">상영 시간을 골라주세요</option>
                             {times.map((t) => (
                               <option key={t} value={t}>
                                 {t}
@@ -430,7 +415,7 @@ export default function Home() {
                       {/* Guests */}
                       <div>
                         <label className="block text-[10px] font-bold text-[#4e5968] mb-1.5 pl-0.5">
-                          방문 인원
+                          관람 인원
                         </label>
                         <div className="relative">
                           <select
@@ -438,7 +423,7 @@ export default function Home() {
                             onChange={(e) => setBookingGuests(Number(e.target.value))}
                             className="w-full rounded-xl border border-transparent bg-[#f2f4f6] py-3 px-3.5 text-xs text-[#191f28] focus:bg-white focus:border-[#3182f6] focus:outline-none transition-all appearance-none cursor-pointer font-semibold"
                           >
-                            {[2, 3, 4, 5, 6].map((num) => (
+                            {[1, 2, 3, 4, 5, 6].map((num) => (
                               <option key={num} value={num}>
                                 {num}명
                               </option>
@@ -504,6 +489,53 @@ export default function Home() {
             </div>
           )}
         </main>
+
+        {/* 📱 BOTTOM FIXED TAB NAVIGATION BAR (Visible only in non-admin mobile view & bookingStep == 0) */}
+        {!isAdmin && bookingStep === 0 && (
+          <nav className="sticky bottom-0 bg-white border-t border-[#f2f4f6] py-2 flex justify-around items-center z-30 toss-shadow">
+            {/* Tab 1: 예약 홈 */}
+            <button
+              onClick={() => {
+                setActiveTab("book");
+                setBookingStep(0);
+              }}
+              className={`flex flex-col items-center gap-1 py-1 cursor-pointer transition-colors ${
+                activeTab === "book" ? "text-[#3182f6]" : "text-[#8b95a1] hover:text-[#4e5968]"
+              }`}
+            >
+              <Calendar className="h-5 w-5" />
+              <span className="text-[9px] font-extrabold">예약 홈</span>
+            </button>
+
+            {/* Tab 2: 내 예약 확인 */}
+            <button
+              onClick={() => {
+                setActiveTab("my-reservations");
+                setBookingStep(0);
+              }}
+              className={`flex flex-col items-center gap-1 py-1 cursor-pointer transition-colors ${
+                activeTab === "my-reservations" ? "text-[#3182f6]" : "text-[#8b95a1] hover:text-[#4e5968]"
+              }`}
+            >
+              <Ticket className="h-5 w-5" />
+              <span className="text-[9px] font-extrabold">내 예약</span>
+            </button>
+
+            {/* Tab 3: 시네마 AI 챗봇 */}
+            <button
+              onClick={() => {
+                setActiveTab("cinema-chat");
+                setBookingStep(0);
+              }}
+              className={`flex flex-col items-center gap-1 py-1 cursor-pointer transition-colors ${
+                activeTab === "cinema-chat" ? "text-[#3182f6]" : "text-[#8b95a1] hover:text-[#4e5968]"
+              }`}
+            >
+              <MessageSquare className="h-5 w-5" />
+              <span className="text-[9px] font-extrabold">AI 챗봇</span>
+            </button>
+          </nav>
+        )}
 
         {/* FOOTER */}
         <footer 
