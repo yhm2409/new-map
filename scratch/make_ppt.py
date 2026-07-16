@@ -204,10 +204,16 @@ def build_presentation():
     p_db_2_sub.font.size = Pt(13)
     p_db_2_sub.font.color.rgb = RGBColor(78, 89, 104)
 
-    # Insert user provided ERD image
-    erd_path = r"c:\Users\yhm2409\Desktop\map\media__1784100070910.png"
-    if os.path.exists(erd_path):
-        s4.shapes.add_picture(erd_path, Inches(6.8), Inches(1.8), width=Inches(5.7))
+    # Insert user provided ERD image (Checked and loaded from exact Gemini Artifact path)
+    erd_artifact_path = r"C:\Users\yhm2409\.gemini\antigravity\brain\514b8155-baf4-4d6f-923a-5def5c7653b5\media__1784100070910.png"
+    erd_local_path = r"c:\Users\yhm2409\Desktop\map\media__1784100070910.png"
+    
+    if os.path.exists(erd_artifact_path):
+        s4.shapes.add_picture(erd_artifact_path, Inches(6.8), Inches(1.8), width=Inches(5.7))
+    elif os.path.exists(erd_local_path):
+        s4.shapes.add_picture(erd_local_path, Inches(6.8), Inches(1.8), width=Inches(5.7))
+    else:
+        print("Warning: ERD image file not found anywhere!")
 
     # ----------------------------------------------------
     # SLIDE 5: 서비스 이용 시연 (Demo and Key Features)
